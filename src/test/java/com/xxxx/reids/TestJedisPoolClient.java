@@ -1,5 +1,7 @@
 package com.xxxx.reids;
 
+import com.xxxx.reids.entity.User;
+import com.xxxx.reids.util.SerializeUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -296,6 +298,18 @@ public class TestJedisPoolClient {
      */
     @Test
     public void testByte() {
-
+        User user = new User();
+        user.setId(2);
+        user.setUsername("zhangsan");
+        user.setPassword("123");
+        //序列化
+        byte[] userKey = SerializeUtil.serialize("user:" + user.getId());
+        byte[] userValue = SerializeUtil.serialize(user);
+        jedis.set(userKey,userValue);
+        //获取数据
+        byte[] userResult = jedis.get(userKey);
+        //反序列化
+        User u = (User) SerializeUtil.unserialize(userResult);
+        System.out.println(u);
     }
 }
