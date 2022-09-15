@@ -164,6 +164,38 @@ public class TestJedisPoolClient {
         jedis.del("student");
     }
 
+    /**
+     * 操作set
+     *
+     * 添加
+     *
+     * 获取
+     *
+     * 获取总条数
+     *
+     * 删除
+     */
+    @Test
+    public void testSet(){
 
+    }
+
+    /**
+     * 操作Sorted Set
+     *
+     * 准备Map数据
+     *
+     * 添加
+     *
+     * 获取
+     *
+     * 获取总条数
+     *
+     * 删除
+     */
+    @Test
+    public void testSortedSet(){
+
+    }
 
 }
