@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SpringBootTest(classes = RedisConfig.class)
+@SpringBootTest
 public class TestJedisPoolClient {
     @Autowired
     private JedisPool jedisPool;
@@ -163,5 +163,7 @@ public class TestJedisPoolClient {
         //删除列表
         jedis.del("student");
     }
+
+
 
 }
