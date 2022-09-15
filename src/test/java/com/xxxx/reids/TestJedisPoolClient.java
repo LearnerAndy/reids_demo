@@ -177,6 +177,15 @@ public class TestJedisPoolClient {
      */
     @Test
     public void testSet(){
+        //添加数据
+        jedis.sadd("letters","aaa","bbb","ccc","ddd","eee");
+        //获取数据
+        jedis.smembers("letters").forEach(System.out::println);
+        //获取总条数
+        System.out.println(jedis.scard("letters"));
+        //删除数据
+        jedis.srem("letters","aaa","bbb");
+        jedis.smembers("letters").forEach(System.out::println);
 
     }
 
@@ -195,7 +204,21 @@ public class TestJedisPoolClient {
      */
     @Test
     public void testSortedSet(){
-
+        //准备添加数据
+        Map<String,Double> scoreMembers = new HashMap<>();
+        scoreMembers.put("zhangsan",7D);
+        scoreMembers.put("lisi", 3D);
+        scoreMembers.put("wangwu", 5D);
+        scoreMembers.put("zhaoliu", 6D);
+        scoreMembers.put("tianqi", 2D);
+        //添加数据
+        jedis.zadd("score",scoreMembers);
+        //获取数据
+        jedis.zrange("score",0,4).forEach(System.out::println);
+        //获取数量
+        System.out.println(jedis.zcard("score"));
+        //删除数据
+        jedis.zrem("score","zhangsan","lisi");
+        jedis.zrange("score",0,4).forEach(System.out::println);
     }
-
 }
