@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Transaction;
+import redis.clients.jedis.params.SetParams;
 
 import java.util.HashMap;
 import java.util.List;
@@ -113,21 +115,21 @@ public class TestJedisPoolClient {
 
     /**
      * 操作List
-     *
+     * <p>
      * 入队（左右添加）lpush rpush
-     *
+     * <p>
      * 出队 (左右)lpop rpop
-     *
+     * <p>
      * 遍历lrange
-     *
+     * <p>
      * 获取lindex
-     *
+     * <p>
      * 修改lset
-     *
+     * <p>
      * 获取总条数llen
-     *
+     * <p>
      * 删除list里面的单条 n个 lrem
-     *
+     * <p>
      * 删除list   del
      */
     @Test
@@ -148,7 +150,7 @@ public class TestJedisPoolClient {
         //获取总条数
         System.out.println(jedis.llen("student"));
         //删除单条
-        jedis.lrem("student",1,"zhangsan");
+        jedis.lrem("student", 1, "zhangsan");
         jedis.lrange("student", 0, -1).forEach(System.out::println);
         //出队
         System.out.println(jedis.rpop("student"));
@@ -163,59 +165,137 @@ public class TestJedisPoolClient {
 
     /**
      * 操作set
-     *
+     * <p>
      * 添加
-     *
+     * <p>
      * 获取
-     *
+     * <p>
      * 获取总条数
-     *
+     * <p>
      * 删除
      */
     @Test
-    public void testSet(){
+    public void testSet() {
         //添加数据
-        jedis.sadd("letters","aaa","bbb","ccc","ddd","eee");
+        jedis.sadd("letters", "aaa", "bbb", "ccc", "ddd", "eee");
         //获取数据
         jedis.smembers("letters").forEach(System.out::println);
         //获取总条数
         System.out.println(jedis.scard("letters"));
         //删除数据
-        jedis.srem("letters","aaa","bbb");
+        jedis.srem("letters", "aaa", "bbb");
         jedis.smembers("letters").forEach(System.out::println);
 
     }
 
     /**
      * 操作Sorted Set
-     *
+     * <p>
      * 准备Map数据
-     *
+     * <p>
      * 添加
-     *
+     * <p>
      * 获取
-     *
+     * <p>
      * 获取总条数
-     *
+     * <p>
      * 删除
      */
     @Test
-    public void testSortedSet(){
+    public void testSortedSet() {
         //准备添加数据
-        Map<String,Double> scoreMembers = new HashMap<>();
-        scoreMembers.put("zhangsan",7D);
+        Map<String, Double> scoreMembers = new HashMap<>();
+        scoreMembers.put("zhangsan", 7D);
         scoreMembers.put("lisi", 3D);
         scoreMembers.put("wangwu", 5D);
         scoreMembers.put("zhaoliu", 6D);
         scoreMembers.put("tianqi", 2D);
         //添加数据
-        jedis.zadd("score",scoreMembers);
+        jedis.zadd("score", scoreMembers);
         //获取数据
-        jedis.zrange("score",0,4).forEach(System.out::println);
+        jedis.zrange("score", 0, 4).forEach(System.out::println);
         //获取数量
         System.out.println(jedis.zcard("score"));
         //删除数据
-        jedis.zrem("score","zhangsan","lisi");
-        jedis.zrange("score",0,4).forEach(System.out::println);
+        jedis.zrem("score", "zhangsan", "lisi");
+        jedis.zrange("score", 0, 4).forEach(System.out::println);
+    }
+
+    /**
+     * Redis中以层级关系、目录形式存储数据
+     */
+    @Test
+    public void testDir() {
+        jedis.set("user:01", "user_zhangsan");
+        System.out.println(jedis.get("user:01"));
+    }
+
+    /**
+     * 设置key的失效时间
+     */
+    @Test
+    public void testExpire() {
+        //方法一：
+        jedis.set("code", "test");
+        jedis.expire("code", 180);
+        jedis.pexpire("code", 180000L);
+        System.out.println(jedis.ttl("code"));//获取秒
+        //方法二：
+        jedis.setex("code", 180, "test");
+        jedis.psetex("code", 180000L, "test");
+        System.out.println(jedis.pttl("code"));//获取毫秒
+        // 方法三：
+        SetParams setParams = new SetParams();
+        //不存在的时候才能设置成功
+        // setParams.nx();
+        // 存在的时候才能设置成功
+        setParams.xx();
+        //设置失效时间，单位秒
+        // setParams.ex(30);
+        //查看失效时间，单位毫秒
+        setParams.px(30000);
+        jedis.set("code", "test", setParams);
+    }
+
+    /**
+     * 获取所有key
+     */
+    @Test
+    public void testAllKeys() {
+        //获取当前key的数量
+        System.out.println(jedis.dbSize());
+        //获取当前key的名称
+        jedis.keys("*").forEach(System.out::println);
+    }
+
+    /**
+     * 操作事务
+     */
+    @Test
+    public void testMulti() {
+        Transaction tx = jedis.multi();
+        //开启事务
+        tx.set("tel", "10010");
+        //提交事务
+//        tx.exec();
+        //回滚事务
+        tx.discard();
+    }
+
+    /**
+     * 删除
+     */
+    @Test
+    public void testDelete() {
+        // 删除 通用 适用于所有数据类型
+        jedis.del("score");
+    }
+
+    /**
+     * 操作byte
+     */
+    @Test
+    public void testByte() {
+
     }
 }
