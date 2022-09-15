@@ -114,9 +114,54 @@ public class TestJedisPoolClient {
         }
     }
 
+    /**
+     * 操作List
+     *
+     * 入队（左右添加）lpush rpush
+     *
+     * 出队 (左右)lpop rpop
+     *
+     * 遍历lrange
+     *
+     * 获取lindex
+     *
+     * 修改lset
+     *
+     * 获取总条数llen
+     *
+     * 删除list里面的单条 n个 lrem
+     *
+     * 删除list   del
+     */
     @Test
     public void testList() {
-
+        //左添加
+        jedis.lpush("student", "zhangsan", "lisi", "wangwu");
+        //遍历
+        jedis.lrange("student", 0, -1).forEach(System.out::println);
+        System.out.println("--------------------------------");
+        //右添加
+        jedis.rpush("student", "zhaoliu", "qianqi", "sunjiu");
+        //遍历
+        List<String> student = jedis.lrange("student", 0, -1);
+        for (String stu : student) {
+            System.out.println(stu);
+        }
+        System.out.println("--------------------------------");
+        //获取总条数
+        System.out.println(jedis.llen("student"));
+        //删除单条
+        jedis.lrem("student",1,"zhangsan");
+        jedis.lrange("student", 0, -1).forEach(System.out::println);
+        //出队
+        System.out.println(jedis.rpop("student"));
+        System.out.println(jedis.lpop("student"));
+        //获取某条
+        System.out.println(jedis.lindex("student", 1));
+        System.out.println(jedis.lset("student", 1, "zhoushi"));
+        System.out.println(jedis.lindex("student", 1));
+        //删除列表
+        jedis.del("student");
     }
 
 }
