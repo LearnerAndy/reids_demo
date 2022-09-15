@@ -1,6 +1,5 @@
 package com.xxxx.reids;
 
-import com.xxxx.reids.config.RedisConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -102,9 +101,7 @@ public class TestJedisPoolClient {
         System.out.println("----------------------------");
         //遍历所有hash类型数据
         Map<String, String> userMap = jedis.hgetAll("userInfo");
-        userMap.forEach((k, v) -> {
-            System.out.println("field-->" + k + ",value-->" + v);
-        });
+        userMap.forEach((k, v) -> System.out.println("field-->" + k + ",value-->" + v));
         System.out.println("+++++++++++++++++++++++++++++++");
         //删除
         jedis.hdel("userInfo", "name");
